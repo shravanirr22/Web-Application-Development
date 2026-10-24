@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Docker Practical</title>
+</head>
+<body>
+    <h1>Docker and Git/GitHub Practical</h1>
+    <button onclick="getMessage()">Get Message</button>
+    <p id="result"></p>
+
+    <script>
+        async function getMessage() {
+            const response = await fetch('/api/message');
+            const data = await response.json();
+            document.getElementById('result').textContent =
+                data.message;
+        }
+    </script>
+</body>
+</html>

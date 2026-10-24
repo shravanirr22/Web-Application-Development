@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Student Registration Portal</title>
+
+<style>
+body {
+    font-family: Arial, sans-serif;
+    background: #e8e8e8;
+}
+
+.container {
+    width: 80%;
+    margin: 20px auto;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+input {
+    width: 95%;
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+button {
+    padding: 10px 20px;
+    background: green;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    margin-top: 5px;
+}
+
+button:hover {
+    background: darkgreen;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+table,
+th,
+td {
+    border: 1px solid #000;
+}
+
+th,
+td {
+    padding: 10px;
+    text-align: center;
+}
+
+th {
+    background: #e8e8e8;
+}
+
+#users {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.card {
+    width: 250px;
+    border: 1px solid gray;
+    padding: 10px;
+    border-radius: 8px;
+    background: #fafafa;
+}
+
+.card h3 {
+    color: green;
+    margin-top: 0;
+}
+
+.deleteBtn {
+    background: red;
+}
+
+.deleteBtn:hover {
+    background: darkred;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h2>Student Registration Portal</h2>
+
+<form id="studentForm">
+
+<input type="text" id="name" placeholder="Enter your Name">
+<input type="text" id="roll" placeholder="Enter your Roll Number">
+<input type="email" id="email" placeholder="Email">
+<input type="text" id="course" placeholder="Course">
+<input type="text" id="mobile" placeholder="Mobile Number">
+<input type="text" id="age" placeholder="Age">
+
+<button type="submit">Register</button>
+<button type="Delete">Delete</button>
+
+</form>
+
+<h2>Registered Students</h2>
+
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Roll</th>
+<th>Email</th>
+<th>Course</th>
+<th>Mobile</th>
+<th>Age</th>
+</tr>
+</thead>
+
+<tbody id="studentTable"></tbody>
+</table>
+
+<hr>
+
+<h2>Users from Local Storage</h2>
+
+<button onclick="loadUsers()">Load Users</button>
+
+<div id="users"></div>
+
+</div>
+
+<script>
+
+const $ = id => document.getElementById(id);
+
+const LS = key =>
+    JSON.parse(localStorage.getItem(key)) || [];
+
+const setLS = (key, data) =>
+    localStorage.setItem(key, JSON.stringify(data));
+
+const form = $('studentForm');
+const table = $('studentTable');
+
+// Table data
+const render = () => {
+
+    table.innerHTML = LS('students')
+        .map(s =>
+            `<tr>
+                <td>${s.name}</td>
+                <td>${s.roll}</td>
+                <td>${s.email}</td>
+                <td>${s.course}</td>
+                <td>${s.mobile}</td>
+                <td>${s.age}</td>
+            </tr>`
+        )
+        .join('');
+};
+
+render();
+
+// Form handling
+form.addEventListener('submit', e => {
+
+    e.preventDefault();
+
+    const [name, roll, email, course, mobile, age] =
+        ['name', 'roll', 'email', 'course', 'mobile', 'age']
+        .map(id => $(id).value.trim());
+
+    if (!name || !roll || !email || !course || !mobile || !age)
+        return alert('All fields required');
+
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+        return alert('Invalid Email');
+
+    if (!/^[0-9]{10}$/.test(mobile))
+        return alert('Enter 10 digit mobile number');
+
+    // Store data to local storage
+    let students = LS('students');
+
+    students.push({
+        name,
+        roll,
+        email,
+        course,
+        mobile,
+        age
+    });
+
+    setLS('students', students);
+
+    form.reset();
+
+    render();
+
+    alert('Student registered successfully!');
+});
+
+// Cards
+window.loadUsers = () => {
+
+    const students = LS('students');
+    const container = $('users');
+
+    container.innerHTML =
+        students.length === 0
+        ? '<p>No registered students found.</p>'
+        : students.map(s =>
+            `<div class="card">
+                <h3>${s.name}</h3>
+                <p><b>Roll:</b> ${s.roll}</p>
+                <p><b>Email:</b> ${s.email}</p>
+                <p><b>Course:</b> ${s.course}</p>
+                <p><b>Mobile:</b> ${s.mobile}</p>
+                <p><b>Age:</b> ${s.age}</p>
+            </div>`
+        ).join('');
+};
+
+</script>
+
+</body>
+</html>
